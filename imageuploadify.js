@@ -59,7 +59,7 @@
   $.fn.imageuploadify = function(opts) {
 
     // Override default option with user's if exist.
-    const settings = $.extend( {}, $.fn.imageuploadify.defaults, opts);
+    const settings = $.extend({}, $.fn.imageuploadify.defaults, opts);
 
     // Initialize every element.
     this.each(function() {
@@ -103,8 +103,9 @@
         </div>
         <div class="imageuploadify-images-list text-center">
           <i class="fa fa-cloud-upload"></i>
-          <span class='imageuploadify-message'>Drag & Drop Your File(s) Here To Upload</span>
-          <button type="button" class="btn btn-default">or select file to upload</button>
+          <span class='imageuploadify-message'>${settings.uploadMessage}</span>
+          <button type="button" class="btn btn-default">${settings.uploadBtnMessage}</button>
+          <div class="imageuploadify-preview-container"></div>
         </div>
       </div>
       `);
@@ -113,7 +114,7 @@
       let overlay = dragbox.find(".imageuploadify-overlay");
       let uploadIcon = dragbox.find(".imageuploadify-overlay i");
 
-      let imagesList = dragbox.find(".imageuploadify-images-list");
+      let imagesList = dragbox.find(".imageuploadify-preview-container");
       let addIcon = dragbox.find(".imageuploadify-images-list i");
       let addMsg = dragbox.find(".imageuploadify-images-list span");
       let button = dragbox.find(".imageuploadify-images-list button");
@@ -139,6 +140,21 @@
         }
       }
 
+      const formatBytes = function(bytes, decimals) {
+        if (bytes === 0) return '0 B';
+
+        decimals = typeof decimals !== 'undefined' ? decimals : 2;
+    
+        const k = 1024;
+        const dm = decimals < 0 ? 0 : decimals;
+        const sizes = ['B', 'kB', 'MB', 'GB'];
+    
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+    
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
+      }
+    
+
       // Function to read a file.
       const readingFile = (id, file) => {
         const fReader = new FileReader();
@@ -149,18 +165,38 @@
         const boxesNb = Math.floor(width / 100);
         const marginSize = Math.floor((width - (boxesNb * 100)) / (boxesNb + 1));
 
+        const fileName = file.name.length > 20 ? file.name.substr(0, 20) + '…' : file.name;
+        const fileSize = formatBytes(file.size);
+
+        const parsedExtraFields = settings.extraFields.replace('{fileName}', file.name);
+
         // Create the preview file container box.
-        let container = $(`<div class='imageuploadify-container'>
-          <button type='button' class='btn btn-danger glyphicon glyphicon-remove'></button>
-          <div class='imageuploadify-details'>
-            <span>${file.name}</span>
-            <span>${file.type}</span>
-            <span>${file.size}</span>
+        let container = $(`
+        <div class="imageuploadify-preview-frame">
+          <div class="imageuploadify-preview-content"></div>
+          <div class="imageuploadify-preview-footer">
+              <div class="text-muted">
+                  <samp>
+                    ${fileName}<br/>
+                    ${fileSize}
+                  </samp>
+              </div>
+
+              ${parsedExtraFields}
+                 
+              <div class="imageuploadify-actions">
+                  <button type="button" class="btn btn-link btn-remover">
+                      🗑<i class="icon-bin"></i>
+                  </button>
+                  <div class="clearfix"></div>
+              </div>
           </div>
-        </div>`);
+        </div>
+        `);
 
         let details = container.find(".imageuploadify-details");
         let deleteBtn = container.find("button");
+        let imagebox = container.find('.imageuploadify-preview-content');
 
         // Preview file container box CSS
         container.css("margin-left", marginSize + "px");
@@ -184,12 +220,8 @@
 
             // Append the image to its container and then the container to the
             // list of files.
-            container.append(image);
+            imagebox.append(image);
             imagesList.append(container);
-
-            // Apply left margin to first container of each row and right to last.
-            imagesList.find(".imageuploadify-container:nth-child(" + boxesNb + "n+4)").css("margin-left", marginSize + "px");
-            imagesList.find(".imageuploadify-container:nth-child(" + boxesNb + "n+3)").css("margin-right", marginSize + "px");
           };
 
         }
@@ -218,16 +250,12 @@
             // list of files.
             container.append(span);
             imagesList.append(container);
-
-            // Apply left margin to first container of each row and right to last.
-            imagesList.find(".imageuploadify-container:nth-child(" + boxesNb + "n+4)").css("margin-left", marginSize + "px");
-            imagesList.find(".imageuploadify-container:nth-child(" + boxesNb + "n+3)").css("margin-right", marginSize + "px");
           };
         }
 
         // Delete the file from the list.
         deleteBtn.on("click", function() {
-          $(this.parentElement).remove();
+          $(this).closest('.imageuploadify-preview-frame').remove();
           for (let index = 0; totalFiles.length > index; ++index) {
             if (totalFiles[index].id === id) {
               totalFiles.splice(index, 1);
@@ -337,15 +365,11 @@
             const marginSize = Math.floor((width - (boxesNb * 100)) / (boxesNb + 1));
 
             // Reset all margins of containers boxes.
-            let containers = imagesList.find(".imageuploadify-container");
+            let containers = imagesList.find(".imageuploadify-preview-container");
             for (let index = 0; index < containers.length; ++index) {
               $(containers[index]).css("margin-right", "0px");
               $(containers[index]).css("margin-left", marginSize + "px");
             }
-
-            // Apply left margin to first container of each row and right to last.
-            imagesList.find(".imageuploadify-container:nth-child(" + boxesNb + "n+4)").css("margin-left", marginSize + "px");
-            imagesList.find(".imageuploadify-container:nth-child(" + boxesNb + "n+3)").css("margin-right", marginSize + "px");
           }, 500);
         });
       })
@@ -420,6 +444,9 @@
 
   // Default configuraiton of the plugin.
   $.fn.imageuploadify.defaults = {
+    uploadMessage: 'Drag & Drop Your File(s) Here To Upload',
+    uploadBtnMessage: 'or select file to upload',
+    extraFields: ''
   };
 
 }(jQuery, window, document));

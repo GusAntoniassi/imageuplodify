@@ -12,12 +12,9 @@
     </head>
 
     <body>
-
-        <div class="container" style="margin-top: 1em;">
-            <form>
-                <input type="file" accept=".xlsx,.xls,image/*,.doc,audio/*,.docx,video/*,.ppt,.pptx,.txt,.pdf" multiple>
-            </form>
-        </div>
+        <form>
+            <input type="file" accept="image/*" multiple>
+        </form>
 
         <script src="bower_components/jquery/dist/jquery.min.js"></script>
         <script src="bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
@@ -25,8 +22,15 @@
 
         <script type="text/javascript">
             $(document).ready(function() {
-                $('input[type="file"]').imageuploadify();
-            })
+                $('input[type="file"]').imageuploadify({
+                    uploadMessage: 'Arraste os arquivos aqui',
+                    uploadBtnMessage: 'ou clique para escolher',
+                    extraFields: `
+                        <div class="mb-1">Imagem destaque</div>
+                        <input name="imagem_destaque" value="{fileName}" type="radio">
+                    `
+                });
+            });
         </script>
 
     </body>
