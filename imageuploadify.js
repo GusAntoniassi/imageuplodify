@@ -222,6 +222,8 @@
             // list of files.
             imagebox.append(image);
             imagesList.append(container);
+
+            settings.afterImageAdd();
           };
 
         }
@@ -250,6 +252,8 @@
             // list of files.
             container.append(span);
             imagesList.append(container);
+
+            settings.afterImageAdd();
           };
         }
 
@@ -446,7 +450,8 @@
   $.fn.imageuploadify.defaults = {
     uploadMessage: 'Drag & Drop Your File(s) Here To Upload',
     uploadBtnMessage: 'or select file to upload',
-    extraFields: ''
+    extraFields: '',
+    afterImageAdd: function() {}
   };
 
 }(jQuery, window, document));
