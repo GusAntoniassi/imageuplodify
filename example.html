@@ -12,8 +12,10 @@
     </head>
 
     <body>
-        <form>
-            <input type="file" accept="image/*" multiple>
+        <form enctype="multipart/form-data" action="/post.php" method="POST">
+            <input name="files[]" type="file" accept="image/*" multiple>
+
+            <button type="submit">Submit</button>
         </form>
 
         <script src="bower_components/jquery/dist/jquery.min.js"></script>

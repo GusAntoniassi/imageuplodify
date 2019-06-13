@@ -186,7 +186,7 @@
                  
               <div class="imageuploadify-actions">
                   <button type="button" class="btn btn-link btn-remover">
-                      🗑<i class="icon-bin"></i>
+                      <i class="fa fa-trash"></i>
                   </button>
                   <div class="clearfix"></div>
               </div>
@@ -405,11 +405,12 @@
               }
             }
           }
-          else if (!inputs[index].getAttribute("type") || ((inputs[index].getAttribute("type").toLowerCase()) !== "checkbox" && (inputs[index].getAttribute("type").toLowerCase()) !== "radio") || inputs[index].checked) {
+          else if (
+            !inputs[index].getAttribute("type") 
+            || (inputs[index].getAttribute("type").toLowerCase() !== "checkbox" && inputs[index].getAttribute("type").toLowerCase() !== "radio") 
+            || inputs[index].checked
+          ) {
             formData.append(inputs[index].name, inputs[index].value);
-          }
-          else if ($(inputs[index]).getAttribute("type") != "file") {
-            formData.append(inputs[index].name, inputs[index].value);  
           }
         }
 
@@ -424,12 +425,17 @@
         // When the request has been successfully submitted, redirect to the
         // location of the form.
         xhr.onreadystatechange = function(e) {
-          if (xhr.status == 200 && xhr.readyState === XMLHttpRequest.DONE) {
-            window.location.replace(xhr.responseURL);
+          if (xhr.readyState === XMLHttpRequest.DONE) {
+            settings.afterSubmit();
+
+            if (xhr.status == 200) {
+              window.location.replace(xhr.responseURL);
+            }
           }
         }
 
         xhr.open("POST", $(this).attr("action"), true);
+        settings.beforeSubmit();
         xhr.send(formData);
 
         return false;
@@ -451,7 +457,9 @@
     uploadMessage: 'Drag & Drop Your File(s) Here To Upload',
     uploadBtnMessage: 'or select file to upload',
     extraFields: '',
-    afterImageAdd: function() {}
+    afterImageAdd: function() {},
+    beforeSubmit: function() {},
+    afterSubmit: function() {}
   };
 
 }(jQuery, window, document));
