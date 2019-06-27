@@ -435,7 +435,14 @@
         }
 
         xhr.open("POST", $(this).attr("action"), true);
-        settings.beforeSubmit();
+        
+        // Do before submit
+        var ret = settings.beforeSubmit();
+        // To support validation, if beforeSubmit returns false abort form submission
+        if (ret === false) {
+          return false;
+        }
+        
         xhr.send(formData);
 
         return false;
