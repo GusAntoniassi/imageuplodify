@@ -430,6 +430,8 @@
 
             if (xhr.status == 200) {
               window.location.replace(xhr.responseURL);
+            } else if (xhr.status >= 400 && xhr.status <= 599) {
+              settings.onError(xhr.responseText);
             }
           }
         }
@@ -466,7 +468,8 @@
     extraFields: '',
     afterImageAdd: function() {},
     beforeSubmit: function() {},
-    afterSubmit: function() {}
+    afterSubmit: function() {},
+    onError: function() {}
   };
 
 }(jQuery, window, document));
